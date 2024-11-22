@@ -11,7 +11,6 @@ mod port {
 
 mod pid {
     pub mod list;
-    pub mod kill;
 }
 
 #[derive(Parser)]
@@ -30,7 +29,7 @@ struct CLI {
 enum Commands {
     Pids {
         #[arg(required = false)]
-        pid: Option<String>, // PID parametresi isteğe bağlı hale getirildi
+        pid: Option<String>,
     },
     Ports,
     Kill {
@@ -44,22 +43,22 @@ async fn main() -> io::Result<()> {
 
     match cli.command {
         Commands::Kill { port } => {
-            if let Err(e) = kill_process_using_port(port) {
+            if let Err(e) = kill_process_using_port(port).await {
                 eprintln!("Hata: {}", e);
             }
         }
         Commands::Ports => {
-            list::list_used_ports();
+            list::list_used_ports().await;
         }
         Commands::Pids { pid } => {
-            match pid {
+            return match pid {
                 Some(process_name) => {
                     list_pids_by_process_name(&*process_name).await;
-                    return Ok(());
+                    Ok(())
                 }
                 None => {
                     list_used_pids().await;
-                    return Ok(());
+                    Ok(())
                 }
             }
         }

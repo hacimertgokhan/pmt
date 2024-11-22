@@ -1,6 +1,6 @@
 use std::process::Command;
 
-pub fn kill_process_using_port(port: u16) -> Result<(), String> {
+pub async fn kill_process_using_port(port: u16) -> Result<(), String> {
     let output = Command::new("lsof")
         .arg("-t")
         .arg(format!("-i:{}", port))

@@ -1,8 +1,7 @@
 use sysinfo::{System};
 use std::process::Command;
 
-#[tokio::main]
-pub(crate) async fn list_used_ports() {
+pub(crate)  async fn list_used_ports() {
     println!("Kullanılan portlar eşzamanlı olarak listeleniyor...");
     let used_ports = get_used_ports().await;
     for (port, app) in used_ports {
@@ -31,11 +30,9 @@ async fn get_used_ports() -> Vec<(u16, String)> {
 fn extract_port_and_app(line: &str) -> Option<(u16, String)> {
     let parts: Vec<&str> = line.split_whitespace().collect();
     if parts.len() > 0 {
-        // Port bilgisi genellikle "TCP *:3000 (LISTEN)" formatında gelir
         if let Some(port_info) = parts.iter().find(|&&part| part.contains(':')) {
             let port_str = port_info.split(':').last().unwrap();
             if let Ok(port) = port_str.parse::<u16>() {
-                // Uygulama adı genellikle ilk parçadır
                 let app_name = parts[0].to_string();
                 return Some((port, app_name));
             }
