@@ -1,7 +1,7 @@
 use std::io;
 use clap::{Parser, Subcommand};
 use crate::pid::list::{list_pids_by_process_name, list_used_pids};
-use crate::port::kill::kill_process_using_port;
+use crate::port::kill::{kill_port_async};
 use crate::port::list;
 
 mod port {
@@ -43,9 +43,7 @@ async fn main() -> io::Result<()> {
 
     match cli.command {
         Commands::Kill { port } => {
-            if let Err(e) = kill_process_using_port(port).await {
-                eprintln!("Hata: {}", e);
-            }
+            kill_port_async(port).await?;
         }
         Commands::Ports => {
             list::list_used_ports().await;
