@@ -1,12 +1,14 @@
 use std::io;
 use clap::{Parser, Subcommand};
 use crate::pid::list::{list_pids_by_process_name, list_used_pids};
-use crate::port::kill::{kill_port_async};
+use crate::port::kill::{kill_port_async, kill_process_by_name_and_port_async};
 use crate::port::list;
+use crate::port::monitor::run_monitor;
 
 mod port {
     pub mod list;
     pub mod kill;
+    pub mod monitor;
 }
 
 mod pid {
@@ -32,7 +34,12 @@ enum Commands {
         pid: Option<String>,
     },
     Ports,
-    Kill {
+    Monitor,
+    KillPortByName {
+        name: String,
+        port: u16,
+    },
+    KillPortByU16 {
         port: u16,
     },
 }
@@ -42,7 +49,7 @@ async fn main() -> io::Result<()> {
     let cli = CLI::parse();
 
     match cli.command {
-        Commands::Kill { port } => {
+        Commands::KillPortByU16 { port } => {
             kill_port_async(port).await?;
         }
         Commands::Ports => {
@@ -59,6 +66,12 @@ async fn main() -> io::Result<()> {
                     Ok(())
                 }
             }
+        }
+        Commands::KillPortByName { name, port } => {
+            kill_process_by_name_and_port_async(&name, port).await?;
+        }
+        Commands::Monitor => {
+            run_monitor()?;
         }
     }
 
